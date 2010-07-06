@@ -28,7 +28,6 @@ class Downloader
       content.scan(page_regexp).each do |link|
         puts "Found link #{link}"
         if not link_list.include? link then link_list << link end
-        break
       end
       # For every url in the link list, visit the page
       # and store the url
@@ -39,8 +38,6 @@ class Downloader
           puts "Found ebook #{ebook}"
           if not ebook_list.include? ebook then ebook_list << ebook end
         end
-        #DEBUG
-        break
       end
       ebook_list
     end
