@@ -43,21 +43,31 @@ class Downloader
     end
 
     def get_page_with_auth(url)
+      retries = 2
       content = nil
-      Net::HTTP.start(@host) { |http|
-        puts "Getting url #{url}"
-        request = Net::HTTP::Get.new(url)
-        request.basic_auth @username, @password
-        response = http.request(request)
-        content = response.body
-      }
+      begin  
+        Net::HTTP.start(@host) { |http|
+          puts "Getting url #{url}"
+          request = Net::HTTP::Get.new(url)
+          request.basic_auth @username, @password
+          response = http.request(request)
+          content = response.body
+        }
+      rescue Timeout::Error
+        if retries > 0
+          retries -= 1
+          retry
+        else
+          puts "Timed out fetching #{url}"
+        end
+      end
       content
     end
     
     def write_list(list, output_file)
       File.open(output_file, "w") do |f|
         list.each do |i|
-          f.write "<a href='#{@site_root + i}'>#{i}</a><br/ >"
+          f.write "<a href='#{@site_root + i}'>#{i}</a><br />\r"
         end
       end
       
